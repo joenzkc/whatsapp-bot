@@ -119,22 +119,23 @@ export class WebhookController {
                   language: {
                     code: 'en_GB',
                   },
+                  components: [
+                    {
+                      type: 'body',
+                      parameters: [
+                        {
+                          type: 'text',
+                          text: sender_name,
+                        },
+                        {
+                          type: 'text',
+                          text: sender_id,
+                        },
+                      ],
+                    },
+                  ],
                 },
-                components: [
-                  {
-                    type: 'body',
-                    parameters: [
-                      {
-                        type: 'text',
-                        text: sender_name,
-                      },
-                      {
-                        type: 'text',
-                        text: sender_id,
-                      },
-                    ],
-                  },
-                ],
+                
               },
             );
           } catch (err) {
