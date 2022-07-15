@@ -38,7 +38,8 @@ export class WebhookController {
   @Post('/webhook')
   async handleEvents(@Body() body: any) {
     if (body) {
-      console.log(body);
+      console.log(body.entry[0]);
+      console.log(body.entry[0].changes);
       if (
         body.entry &&
         body.entry[0].changes &&
