@@ -58,6 +58,7 @@ export class WebhookController {
         console.log(`Received: ${received_text}`);
         const full_message =
           reply_message + 'The message you sent me was: ' + received_text;
+        console.log(message);
 
         if (message === 'start') {
           const body = {
