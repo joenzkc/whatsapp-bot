@@ -67,6 +67,9 @@ export class WebhookController {
             type: 'template',
             template: {
               name: 'message_template',
+              language: {
+                code: 'en_GB',
+              },
             },
           };
 
