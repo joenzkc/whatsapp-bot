@@ -1,73 +1,287 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Setting up WhatsApp Chatbot
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Pre-requisites
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+To setup a WhatsApp Chatbot, you must ensure that you have:
 
-## Description
+1. a WhatsApp Business account
+2. a WhatsApp Developer account
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+You can register for these at https://business.facebook.com and https://developers.facebook.com respectively.
 
-## Installation
+## Setting up your WhatsApp Chatbot
+
+### Step 1: Create the App
+
+On https://developers.facebook.com, click on 'My Apps' at the top right hand corner of the screen. You will be redirected to the Apps page
+![image](images/developer_facebook_page.png)
+
+If you do not have an existing chat bot, click on 'Create App'
+![image_2](images/create_app.png)
+
+Select the app type as 'business'
+![image_3](images/business_type.png)
+
+Fill in the appropriate details
+![image_4](images/setup.png)
+
+Click Create App and your application has been created!
+
+### Step 2: Add WhatsApp to the App
+
+Now, you must add WhatsApp to the App. Do this by scrolling through the products and find WhatsApp, and click 'Set up'
+
+![image_5](images/add_whatsapp.png)
+
+You will be redirected to this page. Click on the Business you wish to link to, and press 'Continue'
+
+![image_6](images/redirect_setup.png)
+
+You can now try sending in a test message by adding in your phone number, and clicking the 'Send Message' button
+
+![image_7](images/send_message.png)
+
+After clicking send message, you should receive such a message to your WhatsApp
+![image_8](images/example_message.png)
+
+Now we need to set-up webhooks to make use of the API.
+
+### Step 3: Setting up the webhooks
+
+In order to set up webhooks, on the left hand side, under 'WhatsApp', click onto Configuration
+
+![image_9](images/configuration_webhooks.png)
+
+Click on 'edit'
+
+![image_10](images/webhook_edit.png)
+
+Now fill in the following form
+![image_11](images/webhook_setup.png)
+
+The callback URL will be to your backend Webhook controller, typically in the form of https://your-domain-here.com/webhook
+
+Verify token refers to the unique key to authorize connection to the webhook. We now go through how Meta verifies and authorizes the webhook.
+
+### Aside: What happens during webhook connection?
+
+During verification, Meta will use the Callback URL as well as the Verify token you have passed in to do the following GET request
 
 ```bash
-$ npm install
+GET https://www.your-clever-domain-name.com/webhooks?
+  hub.mode=subscribe&
+  hub.challenge=1158201444&
+  hub.verify_token={{YOUR_VERIFY_TOKEN}}
 ```
 
-## Running the app
+During this process, Meta expects the backend to:
+
+1. Ensure that the provided `YOUR_VERIFY_TOKEN` is the same as the one in the backend
+2. Return the same value provided in challenge
+
+So an example response to the following request should be:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+1158201444
 ```
 
-## Test
+If the response is not the same as the challenge number, the verification will fail and the webhook setup will fail.
 
-```bash
-# unit tests
-$ npm run test
+An example method can be found in `webhook.controller`
 
-# e2e tests
-$ npm run test:e2e
+### Step 4: Handling Webhook Events
 
-# test coverage
-$ npm run test:cov
+After successfully setting up the webhook, we now need to handle the events sent by WhatsApp.
+
+Setup an endpoint to `'POST /webhook'`, the following request is an example event sent by WhatsApp
+
+```json
+{
+  "object": "whatsapp_business_account",
+  "entry": [{
+      "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+      "changes": [{
+          "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                  "display_phone_number": PHONE_NUMBER,
+                  "phone_number_id": PHONE_NUMBER_ID
+              },
+              "contacts": [{
+                  "profile": {
+                    "name": "NAME"
+                  },
+                  "wa_id": PHONE_NUMBER
+                }],
+              "messages": [{
+                  "from": PHONE_NUMBER,
+                  "id": "wamid.ID",
+                  "timestamp": TIMESTAMP,
+                  "text": {
+                    "body": "MESSAGE_BODY"
+                  },
+                  "type": "text"
+                }]
+          },
+          "field": "messages"
+        }]
+  }]
+}
 ```
 
-## Support
+More example payloads can be found at https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Some important information we can pull from this event are:
 
-## Stay in touch
+1. Senders WhatsApp ID
+2. Text message from the Sender
+3. Time of message sent
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+We try responding to the message with an echo of the message sent to us as an example
 
-## License
+### Step 5: Responding to the webhook
 
-Nest is [MIT licensed](LICENSE).
+From the example request, we can pull out the following information:
+
+```javascript
+const sender_phone_number_id =
+  req.body.entry[0].changes[0].value.metadata.phone_number_id;
+const sender_phone_number =
+  req.body.entry[0].changes[0].values.messages[0].from;
+const sender_message =
+  req.body.entry[0].changes[0].values.messages[0].text.body;
+```
+
+We send a response back to the sender. To do this, we use axios to make a POST request.
+
+```javascript
+await axios.post(
+  `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+  {
+    messaging_product: 'whatsapp',
+    to: sender_phone_number,
+    text: { body: `echo: ${sender_message}` },
+  },
+);
+```
+
+NOTE that access token here refers to the one shown in Step 2 image 3.
+
+We now try sending a message to our text bot.
+
+![image_12](images/successful_echo.png)
+
+Our chat bot has successfully echoed!
+
+### Step 6: Using Message Templates
+
+Message templates can be useful if we want to incorporate **Quick Replies** or **Call to Action**. They can also be useful to have a fixed template to sending replies, and not needing to hard code everything in the backend. We go through some use cases for Message Templates
+
+#### Use case 1: Quick Replies
+
+**Quick replies** are the closest features to buttons in the WhatsApp Chatbot currently available.
+
+![quick_replies](/images/quick_replies.png)
+
+The buttons with the text 'Start', 'Quit' and 'Lol' are the quick replies. By tapping on one, it will immediately reply with the button clicked
+
+![click_reply](images/click_quick_reply.png)
+
+As seen, after clicking 'Lol', 'Lol' is immediately replied.
+
+This can be useful if you want to give a list of available commands for users to choose from, and immediately invoke the command
+
+### Use case 2: Call to Action
+
+**Call to Action** is also a button, used to either:
+
+1. Call a specific phone number
+2. Redirect to a URL.
+
+Businesses can use this to redirect to their company websites, or to call their hotline
+
+![call_to_action](images/call_to_action.png)
+
+### Use case 3: Dynamic variables
+
+Message templates can have dynamic variables within them. So you can use them dynamically to fit the user. We will show more of this later.
+
+### Creating a message template
+
+Creating a message template can be quite confusing in the beginning (because it is so hard to navigate to)
+
+We navigate through the UI to create message templates together
+
+1. Sign in to https://business.facebook.com, click the three line menu icon at the top left
+   ![message_template_1](images/message_template_1.png)
+
+2. Scroll down the menu till you see 'WhatsApp Manager' and click on it
+   ![whatsapp_manager](images/whatsapp_manager.png)
+
+3. Click on the three dots found at the top right of the card
+   ![test_phone](images/test_phone.png)
+   Click on 'Manage Message Templates'
+
+4. Click on 'Create Message Template' to start creating a message template
+   ![create_message_template](images/create_message_template.png)
+
+You will be given options to create a Transactional, Marketing or a OTP. For now, we choose Transactional, and name it anything we like.
+
+Note that we must also select a language. We will select English (UK)
+![creating_template](images/creating_template.png)
+
+5. We fill in the Header with a Text and body. For the body, we use the following to demonstrate dynamic variables
+   ![body_text](images/body_text.png)
+
+6. We add buttons at the bottom. We use **quick reply** to check if the information is correct
+   ![quick_reply_example](images/quick_reply_example.png)
+
+On the right hand side, it shows what our text message will look like
+![preview](images/preview.png)
+
+We click submit now. Lets edit our code to send this template and handle the responses.
+
+### Step 7: Handling the template
+
+We make use of the webhook handler to check if the message is 'start', if the message is start, we create the template and send it back
+
+```javascript
+const message = req.body.entry[0].changes[0].values.messages[0].text.body;
+const sender_phone_number_id =
+  req.body.entry[0].changes[0].value.metadata.phone_number_id;
+const sender_phone_number =
+  req.body.entry[0].changes[0].values.messages[0].from;
+const sender_name = body.entry[0].changes[0].value.contacts[0].profile.name;
+
+if (message === 'start') {
+  await axios.post(
+    `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+    {
+      messaging_product: 'whatsapp',
+      to: sender_phone_number,
+      type: 'template',
+      template: {
+        name: 'testing_templates',
+        language: {
+          code: 'en_GB',
+        },
+      },
+      components: [
+        {
+          type: 'body',
+          parameters: [
+            {
+              type: 'text',
+              text: sender_name,
+            },
+            {
+              type: 'text',
+              text: sender_phone_number,
+            },
+          ],
+        },
+      ],
+    },
+  );
+}
+```
