@@ -79,6 +79,7 @@ export class WebhookController {
               body,
             );
           } catch (err) {
+            console.log(err);
             throw err;
           }
         } else {
