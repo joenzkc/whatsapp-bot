@@ -65,7 +65,7 @@ export class WebhookController {
             {
               messaging_product: 'whatsapp',
               to: from,
-              text: { body: `${reply_message}` },
+              text: { body: full_message },
             },
           );
         } catch (err) {
