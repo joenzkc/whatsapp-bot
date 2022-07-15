@@ -39,7 +39,7 @@ export class WebhookController {
   async handleEvents(@Body() body: any) {
     console.log(body);
     console.log(body.entry[0].changes[0]);
-    console.log(body.entry[0].changes[0].contacts[0]);
-    console.log(body.entry[0].changes[0].messages[0]);
+    console.log(body.entry[0].changes[0].value.contacts[0]);
+    console.log(body.entry[0].changes[0].value.messages[0]);
   }
 }
