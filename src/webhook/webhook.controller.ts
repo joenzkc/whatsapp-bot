@@ -92,7 +92,7 @@ export class WebhookController {
               {
                 messaging_product: 'whatsapp',
                 to: from,
-                text: { body: full_message },
+                text: { body: `echo: ${received_text}` },
               },
             );
           } catch (err) {
