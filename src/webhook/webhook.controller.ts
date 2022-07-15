@@ -56,6 +56,8 @@ export class WebhookController {
         const from = message.from;
         const received_text = message.text.body;
         console.log(`Received: ${received_text}`);
+        const full_message =
+          reply_message + 'The message you sent me was: ' + received_text;
 
         try {
           await axios.post(
