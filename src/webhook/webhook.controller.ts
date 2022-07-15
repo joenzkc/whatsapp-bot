@@ -73,6 +73,7 @@ export class WebhookController {
         }
         return 'Sent message';
       } else {
+        console.log('Bad command');
         throw new BadRequestException('Unknown command!');
       }
     }
