@@ -86,22 +86,56 @@ export class WebhookController {
         }
 
         if (received_text === 'start') {
-          const body = {
-            messaging_product: 'whatsapp',
-            to: from,
-            type: 'template',
-            template: {
-              name: 'message_template',
-              language: {
-                code: 'en_GB',
-              },
-            },
-          };
+          // const body = {
+          //   messaging_product: 'whatsapp',
+          //   to: from,
+          //   type: 'template',
+          //   template: {
+          //     name: 'message_template',
+          //     language: {
+          //       code: 'en_GB',
+          //     },
+          //   },
+          // };
 
+          // try {
+          //   await axios.post(
+          //     `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+          //     body,
+          //   );
+          // } catch (err) {
+          //   console.log(err);
+          //   throw err;
+          // }
           try {
             await axios.post(
               `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
-              body,
+              {
+                messaging_product: 'whatsapp',
+                to: sender_id,
+                type: 'template',
+                template: {
+                  name: 'testing_templates',
+                  language: {
+                    code: 'en_GB',
+                  },
+                },
+                components: [
+                  {
+                    type: 'body',
+                    parameters: [
+                      {
+                        type: 'text',
+                        text: sender_name,
+                      },
+                      {
+                        type: 'text',
+                        text: sender_id,
+                      },
+                    ],
+                  },
+                ],
+              },
             );
           } catch (err) {
             console.log(err);
