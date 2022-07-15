@@ -62,6 +62,28 @@ export class WebhookController {
         const full_message =
           reply_message + 'The message you sent me was: ' + received_text;
         console.log(received_text);
+        if (received_text === 'action') {
+          const body = {
+            messaging_product: 'whatsapp',
+            to: from,
+            type: 'template',
+            template: {
+              name: 'message_test_two',
+              language: {
+                code: 'en_GB',
+              },
+            },
+          };
+          try {
+            await axios.post(
+              `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+              body,
+            );
+          } catch (err) {
+            console.log(err);
+            throw err;
+          }
+        }
 
         if (received_text === 'start') {
           const body = {
