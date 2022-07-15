@@ -58,7 +58,7 @@ export class WebhookController {
         console.log(`Received: ${received_text}`);
 
         try {
-          axios.post(
+          await axios.post(
             `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
             {
               messaging_product: 'whatsapp',
