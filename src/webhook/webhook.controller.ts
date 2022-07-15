@@ -57,15 +57,18 @@ export class WebhookController {
         const received_text = message.text.body;
         console.log(`Received: ${received_text}`);
 
-        axios.post(
-          `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
-          {
-            messaging_product: 'whatsapp',
-            to: from,
-            text: { body: `${reply_message}` },
-          },
-        );
-
+        try {
+          axios.post(
+            `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+            {
+              messaging_product: 'whatsapp',
+              to: from,
+              text: { body: `${reply_message}` },
+            },
+          );
+        } catch (err) {
+          throw err;
+        }
         return 'Sent message';
       } else {
         throw new BadRequestException('Unknown command!');
