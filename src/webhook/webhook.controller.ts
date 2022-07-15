@@ -38,6 +38,7 @@ export class WebhookController {
   @Post('/webhook')
   async handleEvents(@Body() body: any) {
     if (body) {
+      console.log(body);
       if (
         body.entry &&
         body.entry[0].changes &&
@@ -52,10 +53,10 @@ export class WebhookController {
         const sender_id = sender.wa_id;
         const sender_name = sender.profile.name;
         const reply_message = `Hi ${sender_name}, your phone number is ${sender_id}!`;
-        console.log(reply_message);
+        // console.log(reply_message);
         const from = message.from;
         const received_text = message.text.body;
-        console.log(`Received: ${received_text}`);
+        // console.log(`Received: ${received_text}`);
         const full_message =
           reply_message + 'The message you sent me was: ' + received_text;
         console.log(received_text);
