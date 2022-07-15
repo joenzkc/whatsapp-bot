@@ -45,6 +45,7 @@ export class WebhookController {
         body.entry[0].changes[0].value.messages &&
         body.entry[0].changes[0].value.messages[0]
       ) {
+        const message = body.entry[0].changes[0].value.messages[0];
         const phone_number_id =
           body.entry[0].changes[0].value.metadata.phone_number_id;
         const sender = body.entry[0].changes[0].value.contacts[0];
@@ -52,24 +53,46 @@ export class WebhookController {
         const sender_name = sender.profile.name;
         const reply_message = `Hi ${sender_name}, your phone number is ${sender_id}!`;
         console.log(reply_message);
-        const message = body.entry[0].changes[0].value.messages[0];
         const from = message.from;
         const received_text = message.text.body;
         console.log(`Received: ${received_text}`);
         const full_message =
           reply_message + 'The message you sent me was: ' + received_text;
 
-        try {
-          await axios.post(
-            `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
-            {
-              messaging_product: 'whatsapp',
-              to: from,
-              text: { body: full_message },
+        if (message === 'start') {
+          const body = {
+            messaging_product: 'whatsapp',
+            to: from,
+            type: 'template',
+            template: {
+              name: 'message_template',
+              language: {
+                code: 'en_UK',
+              },
             },
-          );
-        } catch (err) {
-          throw err;
+          };
+
+          try {
+            await axios.post(
+              `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+              body,
+            );
+          } catch (err) {
+            throw err;
+          }
+        } else {
+          try {
+            await axios.post(
+              `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+              {
+                messaging_product: 'whatsapp',
+                to: from,
+                text: { body: full_message },
+              },
+            );
+          } catch (err) {
+            throw err;
+          }
         }
         return 'Sent message';
       } else {
