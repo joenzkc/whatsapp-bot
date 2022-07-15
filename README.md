@@ -265,22 +265,22 @@ if (message === 'start') {
         language: {
           code: 'en_GB',
         },
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              {
+                type: 'text',
+                text: sender_name,
+              },
+              {
+                type: 'text',
+                text: sender_phone_number,
+              },
+            ],
+          },
+        ],
       },
-      components: [
-        {
-          type: 'body',
-          parameters: [
-            {
-              type: 'text',
-              text: sender_name,
-            },
-            {
-              type: 'text',
-              text: sender_phone_number,
-            },
-          ],
-        },
-      ],
     },
   );
 }
