@@ -129,26 +129,38 @@ export class WebhookController {
               type: 'list',
               header: {
                 type: 'text',
-                text: 'Select Options',
+                text: 'Welcome',
               },
               body: {
                 text: 'Welcome to my Chatbot. Select an option you would like',
               },
               action: {
-                button: 'button',
+                button: 'View Options',
                 sections: [
                   {
-                    title: 'test 1',
+                    title: 'Account',
                     rows: [
                       {
-                        id: '1',
-                        title: 'idk',
-                        description: 'description',
+                        id: 'account-login',
+                        title: 'Login',
+                        description: 'Log into your account',
                       },
                       {
-                        id: '2',
-                        title: 'idk 2',
-                        description: 'description 2',
+                        id: 'account-forgot',
+                        title: 'Forgot your password',
+                      },
+                    ],
+                  },
+                  {
+                    title: 'Cart',
+                    rows: [
+                      {
+                        id: 'cart-view',
+                        title: 'View my cart',
+                      },
+                      {
+                        id: 'cart-checkout',
+                        title: 'Checkout',
                       },
                     ],
                   },
