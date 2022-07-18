@@ -20,6 +20,7 @@
       - [Reply buttons](#reply-buttons)
   - [Identifying Users](#identifying-users)
   - [Limitations](#limitations)
+  - [Pricing](#pricing)
 
 ## Pre-requisites
 
@@ -592,3 +593,32 @@ The WhatsApp chatbot, while being able to have interactions with users via Inter
 1. No datepicker
 2. Cannot send location
 3. UI/UX not as nice as Telegram
+
+## Pricing
+
+To understand WhatsApp pricing, we must understand the two different kinds of conversations.
+
+1. A **user-initiated conversation** is a conversation which begins with a customer sending a message to a business.
+2. A **business-initiated conversation** is a conversation which begins with a business sending a message to a customer.
+
+Upon initiating a conversation (from either business or user), a conversation will last for 24 hours.
+
+For example, User A wishes to find out more about Business B, so he sends a message to Business B's ChatBot at 12am on 18 July. This means that a _user-initiated_ conversation begins, and will end on 12am of 19 July.
+
+- **Note**: When a message is sent (but not delivered), the conversation session will be in a pre-opened state. Upon successful delivery of the message, the 24 hour period will refresh. This means that if a user sends a message at 12 am, but the message is only delivered at 12:10 am, the 24 hours will refresh to start at 12:10 am.
+- If a message is sent but not delivered within 30 days, the message will be dropped and there will be no conversation charge.
+
+Conversations are chargeable. Within the 24 hour window, any number of messages can be sent and the charge will be the same.
+
+- This means that a conversation with 1 message and a conversation with 1000 messages will cost the same amount
+
+A business is given 1000 free conversations a month. Even if a business has multiple WhatsApp bots, all the bots will only be given 1000 free conversations in total.
+
+Conversations that are initiated through Ads that Click to WhatsApp or through a Facebook Page Call-to-Action are not charged, but conversations subsequently are charged normally.
+
+In Singapore, the cost is as follows:
+
+- For **user-initiated** conversations, USD$0.0224 per conversation
+- For **business-initiated** conversations, USD$0.0745 per conversation
+
+To read more, visit https://developers.facebook.com/docs/whatsapp/pricing.
