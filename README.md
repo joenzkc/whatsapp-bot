@@ -514,7 +514,7 @@ The following is a sample response, similar to the list response
 
 You can make use of the interactive buttons to create an entire message flow for your end users.
 
-We have successfully set up our WhatsApp chatbot!
+You can read more about interactive messages at https://developers.facebook.com/docs/whatsapp/guides/interactive-messages/
 
 ## Identifying Users
 
