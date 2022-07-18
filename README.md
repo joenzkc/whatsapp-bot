@@ -83,6 +83,7 @@ Click on 'edit'
 ![image_10](images/webhook_edit.png)
 
 Now fill in the following form
+
 ![image_11](images/webhook_setup.png)
 
 The callback URL will be to your backend Webhook controller, typically in the form of https://your-domain-here.com/webhook
