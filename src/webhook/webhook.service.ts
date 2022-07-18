@@ -35,7 +35,7 @@ export class WebhookService {
             this.handleButton(from, phone_number_id);
             break;
           case 'start':
-            this.handleStart(phone_number_id, sender_number, sender_name);
+            this.handleStart(phone_number_id, from, sender_name);
             break;
           default:
             this.handleDefault(phone_number_id, from);
@@ -94,7 +94,7 @@ export class WebhookService {
   parseValue(body: any) {
     const phone_number_id =
       body.entry[0].changes[0].value.metadata.phone_number_id;
-    const sender = body.entry[0].changes[0].value.contacts[0].profile;
+    const sender = body.entry[0].changes[0].value.contacts[0];
     const sender_name = sender.name;
     const sender_number = sender.wa_id;
     return { phone_number_id, sender, sender_name, sender_number };
