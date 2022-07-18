@@ -39,7 +39,12 @@ export class WebhookController {
 
   @Post('/webhook')
   async handleEvents(@Body() body: any) {
-    return this.webhookService.handleEvents(body);
+    try {
+      return this.webhookService.handleEvents(body);
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
     // if (body) {
     //   console.log(body.entry[0].changes[0].value);
     //   console.log(body.entry[0].changes[0].value.metadata);
