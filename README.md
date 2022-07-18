@@ -110,6 +110,33 @@ If the response is not the same as the challenge number, the verification will f
 
 An example method can be found in `webhook.controller`
 
+```javascript
+/**
+   * Facebook will call this API to verify the webhook
+   *
+   * Learn more at https://developers.facebook.com/docs/graph-api/webhooks/getting-started#verification-requests
+   * @param mode
+   * @param challenge
+   * @param token
+   * @returns
+   */
+  @Get('/webhook')
+  async verify(
+    @Query('hub.mode') mode: String,
+    @Query('hub.challenge') challenge: String,
+    @Query('hub.verify_token') token: String,
+  ) {
+    if (mode && token) {
+      if (mode === 'subscribe' && token === process.env.VERIFY_TOKEN) {
+        console.log('WEBHOOK VERIFIED');
+        return challenge;
+      } else {
+        throw new BadRequestException('VERIFICATION FAILED');
+      }
+    }
+  }
+```
+
 ### Step 4: Handling Webhook Events
 
 After successfully setting up the webhook, we now need to handle the events sent by WhatsApp.
