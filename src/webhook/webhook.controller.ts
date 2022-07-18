@@ -92,6 +92,93 @@ export class WebhookController {
           }
         }
 
+        if (received_text === 'button') {
+          try {
+            await axios.post(
+              `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+              {
+                messaging_product: 'whatsapp',
+                to: sender_id,
+                type: 'template',
+                template: {
+                  name: 'testing_templates',
+                  language: {
+                    code: 'en_GB',
+                  },
+                  components: [
+                    {
+                      type: 'body',
+                      parameters: [
+                        {
+                          type: 'text',
+                          text: sender_name,
+                        },
+                        {
+                          type: 'text',
+                          text: sender_id,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            );
+          } catch (err) {
+            console.log(err);
+            throw err;
+          }
+        } else {
+          try {
+            const interactive = {
+              type: 'button',
+              header: {
+                type: 'text',
+                text: 'Welcome',
+              },
+              body: {
+                text: 'Welcome to my Chatbot. Select an option you would like',
+              },
+              action: {
+                buttons: [
+                  {
+                    type: 'reply',
+                    reply: {
+                      id: 'button-login',
+                      title: 'Login',
+                    },
+                  },
+                  {
+                    type: 'reply',
+                    reply: {
+                      id: 'button-forgot-password',
+                      title: 'Forgot Password',
+                    },
+                  },
+                  {
+                    type: 'reply',
+                    reply: {
+                      id: 'button-help',
+                      title: 'Help',
+                    },
+                  },
+                ],
+              },
+            };
+
+            await axios.post(
+              `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+              {
+                messaging_product: 'whatsapp',
+                to: from,
+                type: 'interactive',
+                interactive: interactive,
+              },
+            );
+          } catch (err) {
+            throw err;
+          }
+        }
+
         if (received_text === 'start') {
           try {
             await axios.post(
