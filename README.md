@@ -227,7 +227,7 @@ Message templates can be useful if we want to incorporate **Quick Replies** or *
 
 #### Use case 1: Quick Replies
 
-**Quick replies** are the closest features to buttons in the WhatsApp Chatbot currently available.
+**Quick replies** are buttons that when pressed, will reply with the same text in the button.
 
 ![quick_replies](/images/quick_replies.png)
 
