@@ -95,7 +95,7 @@ export class WebhookService {
     const phone_number_id =
       body.entry[0].changes[0].value.metadata.phone_number_id;
     const sender = body.entry[0].changes[0].value.contacts[0];
-    const sender_name = sender.name;
+    const sender_name = sender.profile.name;
     const sender_number = sender.wa_id;
     return { phone_number_id, sender, sender_name, sender_number };
   }
@@ -187,10 +187,6 @@ export class WebhookService {
    * Handler for when the user types action
    */
   async handleStart(phone_number_id, sender_number, sender_name) {
-    console.log('phone_number id', phone_number_id);
-    console.log('token', process.env.TOKEN);
-    console.log('sender_number', sender_number);
-    console.log('sender_name', sender_name);
     try {
       await axios.post(
         `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
@@ -209,7 +205,7 @@ export class WebhookService {
                 parameters: [
                   {
                     type: 'text',
-                    text: 'filler',
+                    text: sender_name,
                   },
                   {
                     type: 'text',
