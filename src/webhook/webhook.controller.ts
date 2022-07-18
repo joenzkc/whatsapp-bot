@@ -49,6 +49,9 @@ export class WebhookController {
         body.entry[0].changes[0].value.messages[0]
       ) {
         const message = body.entry[0].changes[0].value.messages[0];
+        if (message.type && message.type === 'button') {
+          console.log(message.button);
+        }
         const phone_number_id =
           body.entry[0].changes[0].value.metadata.phone_number_id;
         const sender = body.entry[0].changes[0].value.contacts[0];
@@ -86,27 +89,6 @@ export class WebhookController {
         }
 
         if (received_text === 'start') {
-          // const body = {
-          //   messaging_product: 'whatsapp',
-          //   to: from,
-          //   type: 'template',
-          //   template: {
-          //     name: 'message_template',
-          //     language: {
-          //       code: 'en_GB',
-          //     },
-          //   },
-          // };
-
-          // try {
-          //   await axios.post(
-          //     `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
-          //     body,
-          //   );
-          // } catch (err) {
-          //   console.log(err);
-          //   throw err;
-          // }
           try {
             await axios.post(
               `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
@@ -135,7 +117,6 @@ export class WebhookController {
                     },
                   ],
                 },
-                
               },
             );
           } catch (err) {
