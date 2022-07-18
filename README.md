@@ -1,4 +1,25 @@
-# Setting up WhatsApp Chatbot
+# Table of Contents
+
+- [Table of Contents](#table-of-contents)
+  - [Pre-requisites](#pre-requisites)
+  - [Setting up your WhatsApp Chatbot](#setting-up-your-whatsapp-chatbot)
+    - [Step 1: Create the App](#step-1-create-the-app)
+    - [Step 2: Add WhatsApp to the App](#step-2-add-whatsapp-to-the-app)
+    - [Step 3: Setting up the webhooks](#step-3-setting-up-the-webhooks)
+    - [Aside: What happens during webhook connection?](#aside-what-happens-during-webhook-connection)
+    - [Step 4: Handling Webhook Events](#step-4-handling-webhook-events)
+    - [Step 5: Responding to the webhook](#step-5-responding-to-the-webhook)
+    - [Step 6: Using Message Templates](#step-6-using-message-templates)
+      - [Use case 1: Quick Replies](#use-case-1-quick-replies)
+      - [Use case 2: Call to Action](#use-case-2-call-to-action)
+      - [Use case 3: Dynamic variables](#use-case-3-dynamic-variables)
+      - [Creating a message template](#creating-a-message-template)
+    - [Step 7: Handling the template](#step-7-handling-the-template)
+    - [Interactive messages](#interactive-messages)
+      - [List messages](#list-messages)
+      - [Reply buttons](#reply-buttons)
+  - [Identifying Users](#identifying-users)
+  - [Limitations](#limitations)
 
 ## Pre-requisites
 
@@ -191,7 +212,7 @@ As seen, after clicking 'Lol', 'Lol' is immediately replied.
 
 This can be useful if you want to give a list of available commands for users to choose from, and immediately invoke the command
 
-### Use case 2: Call to Action
+#### Use case 2: Call to Action
 
 **Call to Action** is also a button, used to either:
 
@@ -202,11 +223,11 @@ Businesses can use this to redirect to their company websites, or to call their 
 
 ![call_to_action](images/call_to_action.png)
 
-### Use case 3: Dynamic variables
+#### Use case 3: Dynamic variables
 
 Message templates can have dynamic variables within them. So you can use them dynamically to fit the user. We will show more of this later.
 
-### Creating a message template
+#### Creating a message template
 
 Creating a message template can be quite confusing in the beginning (because it is so hard to navigate to)
 
@@ -237,6 +258,7 @@ Note that we must also select a language. We will select English (UK)
    ![quick_reply_example](images/quick_reply_example.png)
 
 On the right hand side, it shows what our text message will look like
+
 ![preview](images/preview.png)
 
 We click submit now. Lets edit our code to send this template and handle the responses.
@@ -285,3 +307,261 @@ if (message === 'start') {
   );
 }
 ```
+
+We see that after we send start, the message has filled up with the correct information
+
+![dynamic_image](images/dynamic_variables.png)
+
+**Differentiating between button reply vs normal text reply**
+
+A reply to a button will have a different payload compared to a normal text
+
+```json
+// This is nested within entry[0].value.messages[0]
+// Normal text
+{
+  "from": '...',
+  "id": 'wamid.HBgKNjU4NjY2NDM3NRUCABIYFDNFQjBDNUE2RTlBMDhBMzI4ODM4AA==',
+  "timestamp": '1658108791',
+  "text": [Object],
+  "type": 'text'
+}
+
+// Button reply
+{
+  "context": [Object],
+  "from": '6586664375',
+  "id": 'wamid.HBgKNjU4NjY2NDM3NRUCABIYFDNFQjAzOUJDQ0Q3NEU5OUI1NDMxAA==',
+  "timestamp": '1658108632',
+  "type": 'button',
+  "button": [Object]
+}
+
+// Button object
+{ "payload": 'Yes', "text": 'Yes' }
+```
+
+We can see that button will have type 'button' instead of text, the button object will have a payload and text, which are likely the same. We can make use of this to differentiate between button replies and normal texts
+
+### Interactive messages
+
+Another way to send messages with buttons are interactive messages. We use the Message API to send these. The two types of messages are **list messages** and **reply buttons**
+
+#### List messages
+
+These messages can be used to list out options to choose from.
+
+To create a list message, we need an interactive object, below is an example interactive object:
+
+```javascript
+const interactive = {
+  type: 'list',
+  header: {
+    type: 'text',
+    text: 'Welcome',
+  },
+  body: {
+    text: 'Welcome to my Chatbot. Select an option you would like',
+  },
+  action: {
+    button: 'View Options',
+    sections: [
+      {
+        title: 'Account',
+        rows: [
+          {
+            id: 'account-login',
+            title: 'Login',
+            description: 'Log into your account',
+          },
+          {
+            id: 'account-forgot',
+            title: 'Forgot your password',
+          },
+        ],
+      },
+      {
+        title: 'Cart',
+        rows: [
+          {
+            id: 'cart-view',
+            title: 'View my cart',
+          },
+          {
+            id: 'cart-checkout',
+            title: 'Checkout',
+          },
+        ],
+      },
+    ],
+  },
+};
+
+await axios.post(
+  `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+  {
+    messaging_product: 'whatsapp',
+    to: from,
+    type: 'interactive',
+    interactive: interactive,
+  },
+);
+```
+
+This list message will send the following:
+
+![interactive](images/interactive_example.png)
+
+![click-interactive](images/click_interactive.png)
+
+We can tell that the following response is from clicking an interactive message as the following webhook will be sent:
+
+```json
+// Example message from webhook
+{
+  "context": [Object],
+  "from": '...',
+  "id": 'wamid.HBgKNjU4NjY2NDM3NRUCABIYFDNFQjBDQTJBQzhDRkZCMjZGNkFCAA==',
+  "timestamp": '1658112692',
+  "type": 'interactive',
+  "interactive": [Object]
+}
+
+// interactive object
+{
+  "type": 'list_reply',
+  "list_reply": { id: 'account-forgot', title: 'Forgot your password' }
+}
+```
+
+We can see that the list_reply id is the same the one we set in the code above. This is how we can handle the list replies
+
+#### Reply buttons
+
+These are similar to message templates, except that the response will be an interactive type response. This could be potentially better to use if we want to tie an ID to each button click.
+
+```javascript
+const interactive = {
+  type: 'button',
+  header: {
+    type: 'text',
+    text: 'Welcome',
+  },
+  body: {
+    text: 'Welcome to my Chatbot. Select an option you would like',
+  },
+  action: {
+    buttons: [
+      {
+        type: 'reply',
+        reply: {
+          id: 'button-login',
+          title: 'Login',
+        },
+      },
+      {
+        type: 'reply',
+        reply: {
+          id: 'button-forgot-password',
+          title: 'Forgot Password',
+        },
+      },
+      {
+        type: 'reply',
+        reply: {
+          id: 'button-help',
+          title: 'Help',
+        },
+      },
+    ],
+  },
+};
+
+await axios.post(
+  `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
+  {
+    messaging_product: 'whatsapp',
+    to: from,
+    type: 'interactive',
+    interactive: interactive,
+  },
+);
+```
+
+This will send the following message:
+
+![button](images/button.png)
+
+The following is a sample response, similar to the list response
+
+```javascript
+// Message object
+{
+  context: [Object],
+  from: '6586664375',
+  id: 'wamid.HBgKNjU4NjY2NDM3NRUCABIYFDNFQjBBNTEwNzhFQjJEMTE0REFGAA==',
+  timestamp: '1658113969',
+  type: 'interactive',
+  interactive: [Object]
+}
+
+// interactive object
+{
+  type: 'button_reply',
+  button_reply: { id: 'button-login', title: 'Login' }
+}
+```
+
+You can make use of the interactive buttons to create an entire message flow for your end users.
+
+We have successfully set up our WhatsApp chatbot!
+
+## Identifying Users
+
+You can identify users in the payload sent
+
+The following is a sample payload:
+
+```json
+{
+  "object": "whatsapp_business_account",
+  "entry": [{
+      "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+      "changes": [{
+          "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                  "display_phone_number": PHONE_NUMBER,
+                  "phone_number_id": PHONE_NUMBER_ID
+              },
+              "contacts": [{
+                  "profile": {
+                    "name": "NAME"
+                  },
+                  "wa_id": PHONE_NUMBER
+                }],
+              "messages": [{
+                  "from": PHONE_NUMBER,
+                  "id": "wamid.ID",
+                  "timestamp": TIMESTAMP,
+                  "text": {
+                    "body": "MESSAGE_BODY"
+                  },
+                  "type": "text"
+                }]
+          },
+          "field": "messages"
+        }]
+  }]
+}
+```
+
+We can extract the WhatsApp ID of the end user through the metadata field, and retrieve their phone_number_id. We can then store this ID in our database to keep track of users
+
+## Limitations
+
+The WhatsApp chatbot, while being able to have interactions with users via Interactive Message Templates and Interactive Messages, is not as robust as Telegram bot capabilities
+
+1. No datepicker
+2. Cannot send location
+3. UI/UX not as nice as Telegram
