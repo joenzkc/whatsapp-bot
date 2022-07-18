@@ -36,15 +36,19 @@ You can register for these at https://business.facebook.com and https://develope
 ### Step 1: Create the App
 
 On https://developers.facebook.com, click on 'My Apps' at the top right hand corner of the screen. You will be redirected to the Apps page
+
 ![image](images/developer_facebook_page.png)
 
 If you do not have an existing chat bot, click on 'Create App'
+
 ![image_2](images/create_app.png)
 
 Select the app type as 'business'
+
 ![image_3](images/business_type.png)
 
 Fill in the appropriate details
+
 ![image_4](images/setup.png)
 
 Click Create App and your application has been created!
