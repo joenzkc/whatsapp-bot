@@ -52,6 +52,10 @@ export class WebhookController {
         if (message.type && message.type === 'button') {
           console.log(message.button);
         }
+
+        if (message.type && message.type === 'interactive') {
+          console.log(message.interactive);
+        }
         const phone_number_id =
           body.entry[0].changes[0].value.metadata.phone_number_id;
         const sender = body.entry[0].changes[0].value.contacts[0];
