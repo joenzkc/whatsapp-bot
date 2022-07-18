@@ -190,6 +190,7 @@ export class WebhookService {
     console.log('phone_number id', phone_number_id);
     console.log('token', process.env.TOKEN);
     console.log('sender_number', sender_number);
+    console.log('sender_name', sender_name);
     try {
       await axios.post(
         `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
@@ -208,7 +209,7 @@ export class WebhookService {
                 parameters: [
                   {
                     type: 'text',
-                    text: sender_name,
+                    text: 'filler',
                   },
                   {
                     type: 'text',
