@@ -125,12 +125,44 @@ export class WebhookController {
           }
         } else {
           try {
+            const interactive = {
+              type: 'list',
+              header: {
+                type: 'text',
+                text: 'Select Options',
+              },
+              body: {
+                text: 'Welcome to my Chatbot. Select an option you would like',
+              },
+              action: {
+                button: 'button',
+                sections: [
+                  {
+                    title: 'test 1',
+                    rows: [
+                      {
+                        id: '1',
+                        title: 'idk',
+                        description: 'description',
+                      },
+                      {
+                        id: '2',
+                        title: 'idk 2',
+                        description: 'description 2',
+                      },
+                    ],
+                  },
+                ],
+              },
+            };
+
             await axios.post(
               `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${process.env.TOKEN}`,
               {
                 messaging_product: 'whatsapp',
                 to: from,
-                text: { body: `echo: ${received_text}` },
+                type: 'interactive',
+                interactive: interactive,
               },
             );
           } catch (err) {
